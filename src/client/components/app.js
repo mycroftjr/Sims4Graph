@@ -8,8 +8,7 @@ import { NodeInfo } from './node-info';
 import { Menu } from './menu';
 
 async function getElements() {
-  const response = await fetch('raw.githubusercontent.com/mycroftjr/Sims4Graph/gh-pages/data/elements.json', {
-    mode: "cors",
+  const response = await fetch('https://github.com/mycroftjr/Sims4Graph/raw/main/data/elements.json', {
     headers: {
       'Content-Type': 'application/json'
     }
