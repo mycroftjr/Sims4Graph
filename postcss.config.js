@@ -32,7 +32,7 @@ let conf = {
         maxSize: Number.MAX_SAFE_INTEGER
       }
     ]),
-    require('postcss-cssnext')({
+    require('postcss-preset-env')({
       browsers: require('./package.json').browserslist,
       warnForDuplicates: false
     }),
