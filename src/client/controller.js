@@ -231,12 +231,11 @@ class Controller {
       const data = node.data();
       const wordList = [];
       
-      addWords(wordList, data.name);
-      addWords(wordList, data.Synonym);
-      addWords(wordList, data.NodeTypeFormatted);
-      addWords(wordList, data.Milk);
-      addWords(wordList, data.Type);
-      addWords(wordList, data.Country);
+      addWords(wordList, data.id)
+      addWords(wordList, data.Name);
+      addWords(wordList, data.Class);
+      addWords(wordList, data.Instance);
+      addWords(wordList, data.Module);
         
       node.data('words', wordList);
     };

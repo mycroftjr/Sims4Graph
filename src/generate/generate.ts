@@ -111,7 +111,7 @@ function generate() {
             console.log(eles.nodes.length, eles.edges.length);
         }
     });
-    const p = fs.realpathSync("src/client/components") + "/elements.json";
+    const p = fs.realpathSync("data") + "/elements.json";
     console.log(p);
     packages.on("end", () => {
         fs.writeFileSync(p, JSON.stringify(eles));
