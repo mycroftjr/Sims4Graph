@@ -1,12 +1,13 @@
 import { h, Component } from 'preact';
 import { Controller } from '../controller';
 import Cytoscape from 'cytoscape';
-import { style } from '../cy-conf';
+import { style, elements } from '../cy-conf';
 import CytoscapeComponent from './cytoscape';
 import { isDev } from '../env';
 import { NodeInfo } from './node-info';
 import { Menu } from './menu';
 
+/*
 async function getElements() {
   const response = await fetch('https://media.githubusercontent.com/media/mycroftjr/Sims4Graph/main/data/elements.json', {
     mode: "no-cors",
@@ -14,15 +15,16 @@ async function getElements() {
       'Content-Type': 'application/json'
     }
   });
-  return response.json();
+  const elements = await response.json();
 }
+*/
 
 class AppComponent extends Component {
   constructor(props){
     super(props);
 
     const cy = new Cytoscape({
-      elements: getElements(),
+      elements,
       style,
       layout: { name: 'preset' },
       selectionType: 'single',

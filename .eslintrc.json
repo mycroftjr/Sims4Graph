@@ -17,5 +17,33 @@
   ],
   "rules": {
     "semi": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "parserOptions": {
+        "ecmaFeatures": { "jsx": true },
+        "ecmaVersion": 2018,
+        "project": "./tsconfig.json"
+      },
+      "env": { "browser": true, "es6": true, "node": true },
+      "globals": { "Atomics": "readonly", "SharedArrayBuffer": "readonly" },
+      "rules": {
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "@typescript-eslint/no-explicit-any": 0
+      },
+      "settings": {
+        "react": {
+          "version": "detect"
+        }
+      }
+    }
+  ]
 }

@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import memoize from 'lodash.memoize';
+import { _16To10 } from "simple-base-converter";
 
 const layoutPadding = 10;
 const animationDuration = 500;
@@ -230,13 +231,14 @@ class Controller {
     const cacheNodeWords = node => {
       const data = node.data();
       const wordList = [];
-      
-      addWords(wordList, data.id)
-      addWords(wordList, data.Name);
+
+      addWords(wordList, data.id);
+      addWords(wordList, _16To10(data.id));
+      addWords(wordList, data.name);
       addWords(wordList, data.Class);
       addWords(wordList, data.Instance);
       addWords(wordList, data.Module);
-        
+
       node.data('words', wordList);
     };
 
