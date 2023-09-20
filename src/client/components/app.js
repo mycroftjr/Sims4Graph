@@ -26,9 +26,18 @@ class AppComponent extends Component {
     const cy = new Cytoscape({
       elements,
       style,
-      layout: { name: 'preset' },
+      layout: {
+        name: 'preset',
+        ready: () => {
+          console.log('layoutready');
+          cy.eles().remove();
+        },
+        stop: () => console.log('layoutstop')
+      },
       selectionType: 'single',
-      boxSelectionEnabled: false
+      boxSelectionEnabled: false,
+      hideEdgesOnViewport: true,
+      textureOnViewport: true,
     });
 
     cy.nodes().panify().ungrabify();
@@ -50,6 +59,7 @@ class AppComponent extends Component {
     bus.on('hideInfo', this.onHideInfo = (() => {
       this.setState({ infoNode: null });
     }));
+    console.log('AppComponent init done');
   }
 
   componentWillUnmount(){

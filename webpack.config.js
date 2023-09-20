@@ -8,11 +8,12 @@ const conf = {
 
   entry: {
     bundle: './src/client/index.js',
-    polyfills: './src/client/polyfills.js'
+    polyfills: './src/client/polyfills.js',
   },
 
   output: {
-    filename: '[name].js'
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist')
   },
 
   devtool: !isProd ? 'inline-source-map' : false,
@@ -28,6 +29,10 @@ const conf = {
         options: {
           cacheDirectory: true
         }
+      },
+      {
+        test: /\.csv/,
+        type: 'asset',
       }
     ]
   }

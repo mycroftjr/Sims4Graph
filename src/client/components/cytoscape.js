@@ -6,10 +6,11 @@ class CytoscapeComponent extends Component {
   }
 
   render(){
-    return h('div', { id: 'cy' });    
+    return h('div', { id: 'cy' });
   }
 
   componentDidMount(){
+    console.log('CytoscapeComponent.componentDidMount started');
     const { cy, controller } = this.props;
     const container = document.getElementById('cy');
 
@@ -18,7 +19,7 @@ class CytoscapeComponent extends Component {
 
     cy.on('tap', this.onTap = e => {
       if( e.target === cy ){
-        controller.unhighlight();
+        // controller.unhighlight();
         controller.hideInfo();
         controller.closeMenu();
       } else {

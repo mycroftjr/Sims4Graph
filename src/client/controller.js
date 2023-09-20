@@ -1,6 +1,5 @@
 import EventEmitter from 'eventemitter3';
 import memoize from 'lodash.memoize';
-import { _16To10 } from "simple-base-converter";
 
 const layoutPadding = 10;
 const animationDuration = 500;
@@ -19,8 +18,7 @@ class Controller {
     this.cy = cy;
     this.bus = new EventEmitter();
     this.menu = false;
-    this.nodes = cy.nodes();
-    this.searchMatchNodes = cy.collection();
+    this.searchMatchNodes = [];
   }
 
   isMenuOpen(){
@@ -55,7 +53,7 @@ class Controller {
 
   showInfo(node){
     this.infoNode = node;
-
+    console.log('controller.showInfo(', node, 'emitting showInfo');
     this.bus.emit('showInfo', node);
   }
 
@@ -70,26 +68,30 @@ class Controller {
   }
 
   highlight(node){
-    const { cy } = this;
-
     if( this.highlightInProgress ){ return Promise.resolve(); }
+    console.log('controller.highlight(', node.data());
 
     this.highlightInProgress = true;
 
-    const allEles = cy.elements();
+    const allEles = this.cy.elements();
     const nhood = this.lastHighlighted = node.closedNeighborhood();
     const others = this.lastUnhighlighted = allEles.not( nhood );
 
     const showOverview = () => {
-      cy.batch(() => {
-        allEles.removeClass('faded highlighted hidden');
-
+      console.log('controller.hightlight.showOverview start');
+      this.cy.batch(() => {
+        // allEles.removeClass('faded highlighted');
+        nhood.restore().show();
+        // nhood.removeClass('hidden');
         nhood.addClass('highlighted');
-        others.addClass('hidden');
+        // others.addClass('hidden');
+        others.remove();
 
-        others.positions(getOrgPos);
+        // others.positions(getOrgPos);
       });
+      console.log('controller.highlight.showOverview batches done');
 
+      /*
       const layout = nhood.layout({
         name: 'preset',
         positions: getOrgPos,
@@ -99,13 +101,16 @@ class Controller {
         animationEasing: easing,
         padding: layoutPadding
       });
-
       layout.run();
+      console.log('controller.highlight.showOverview layout.run finished');
+      */
 
-      return layout.promiseOn('layoutstop');
+      // return layout.promiseOn('layoutstop');
+      return Promise.resolve();
     };
 
     const runLayout = () => {
+      console.log('controller.hightlight.runLayout start');
       const p = getOrgPos(node);
 
       const layout = nhood.layout({
@@ -131,43 +136,42 @@ class Controller {
         levelWidth: () => { return 1; },
         padding: layoutPadding
       });
-
-      const promise = layout.promiseOn('layoutstop');
-
       layout.run();
+      console.log('controller.hightlight.runLayout layout.run() finished');
 
-      return promise;
+      return layout.promiseOn('layoutstop');
     };
 
+    /*
     const showOthersFaded = () => {
-      cy.batch(() => {
-        others.removeClass('hidden').addClass('faded');
+      this.cy.batch(() => {
+        others.show().addClass('faded');
       });
     };
-
-    this.bus.emit('highlight', node);
+    */
 
     return (
       Promise.resolve()
       .then( showOverview )
-      .then( () => delayPromise(animationDuration) )
+      //.then( () => delayPromise(animationDuration) )
       .then( runLayout )
-      .then( showOthersFaded )
+      // .then( showOthersFaded )
       .then( () => {
+        console.log('controller.hightlight InProgress = false');
         this.highlightInProgress = false;
         this.bus.emit('highlightend', node);
       })
     );
   }
 
+  /*
   unhighlight(){
     if( !this.hasHighlight() ){ return Promise.resolve(); }
 
-    const { cy } = this;
-    const allEles = cy.elements();
-    const allNodes = cy.nodes();
+    const allEles = this.cy.elements();
+    const allNodes = this.cy.nodes();
 
-    cy.stop();
+    this.cy.stop();
     allNodes.stop();
 
     const nhood = this.lastHighlighted;
@@ -176,16 +180,7 @@ class Controller {
     this.lastHighlighted = this.lastUnhighlighted = null;
 
     const hideOthers = function(){
-      others.addClass('hidden');
-
-      return Promise.resolve();
-    };
-
-    const resetClasses = function(){
-      cy.batch(function(){
-        allEles.removeClass('hidden').removeClass('faded').removeClass('highlighted');
-      });
-      
+      others.hide();
       return Promise.resolve();
     };
 
@@ -200,11 +195,19 @@ class Controller {
     };
 
     const restorePositions = () => {
-      cy.batch(() => {
+      this.cy.batch(() => {
         others.nodes().positions(getOrgPos);
       });
 
       return animateToOrgPos( nhood.nodes() );
+    };
+
+    const resetClasses = function(){
+      this.cy.batch(function(){
+        allEles.removeClass(['faded', 'highlighted']).show();
+      });
+      
+      return Promise.resolve();
     };
 
     this.bus.emit('unhighlight');
@@ -216,31 +219,13 @@ class Controller {
       .then( resetClasses )
     );
   }
+  */
 
-  updateSearch(queryString){
-    const normalize = str => str.toLowerCase();
-    const getWords = str => str.split(/\s+/);
-    const queryWords = getWords(normalize(queryString));
-
-    const addWords = (wordList, wordsStr) => {
-      if( wordsStr ){
-        wordList.push(...getWords(normalize(wordsStr)));
-      }
-    };
-
-    const cacheNodeWords = node => {
-      const data = node.data();
-      const wordList = [];
-
-      addWords(wordList, data.id);
-      addWords(wordList, _16To10(data.id));
-      addWords(wordList, data.name);
-      addWords(wordList, data.Class);
-      addWords(wordList, data.Instance);
-      addWords(wordList, data.Module);
-
-      node.data('words', wordList);
-    };
+  updateSearch(queryString) {
+    if (queryString.length == 0)
+      return;
+    const getWords = str => str.split(/[\s_]+/);
+    const queryWords = getWords(queryString.toLowerCase());
 
     const getStringSimilarity = (queryWord, nodeWord) => {
       const index = nodeWord.indexOf(queryWord);
@@ -277,20 +262,13 @@ class Controller {
 
     const getNodeMetric = memoize(node => getMetric(node, queryWords), node => node.id());
 
-    if( !this.cachedNodeWords ){
-      this.cy.batch(() => {
-        this.nodes.forEach(cacheNodeWords);
-      });
-
-      this.cachedNodeWords = true;
-    }
-
-    this.searchMatchNodes = this.nodes.filter(node => {
+    this.searchMatchNodes = this.cy.nodes().filter(node => {
       return getNodeMetric(node) > minMetricValue;
     }).sort((nodeA, nodeB) => {
       return getNodeMetric(nodeB) - getNodeMetric(nodeA);
     });
 
+    console.log('emitting updateSearch (', queryString, ')', this.searchMatchNodes.length, 'of', this.cy.nodes().length);
     this.bus.emit('updateSearch', this.searchMatchNodes);
 
     return this.searchMatchNodes;

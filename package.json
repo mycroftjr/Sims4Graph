@@ -14,7 +14,7 @@
     "prod": "cross-env NODE_ENV=production run-s build",
     "build": "run-s build:*",
     "generate": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && node out/generate/generate.js",
-    "nodeStyles": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && node out/generate/nodeStyles.js",
+    "convertToCSV": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && node out/generate/convertToCSV.js",
     "watch": "run-p watch:*",
     "watch:livereload": "livereload 'dist, index.html' -w 1000",
     "watch:http": "http-server .",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.7.0",
-    "@s4tk/models": "^0.6.9",
+    "@s4tk/models": "file:../s4tk/models/dst",
     "bigint-polyfill": "^0.1.0",
     "classnames": "^2.2.6",
     "cytoscape": "^3.12.1",
@@ -76,6 +76,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.memoize": "^4.1.2",
     "normalize.css": "^8.0.1",
+    "papaparse": "^5.4.1",
     "preact": "^10.0.5",
     "simple-base-converter": "^1.0.19"
   }

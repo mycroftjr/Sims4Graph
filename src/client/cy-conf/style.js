@@ -19,6 +19,7 @@ edge {
 	overlay-opacity: 0;
 	events: no;
 	line-color: #DE3128;
+	mid-target-arrow-shape: triangle;
 }
 
 edge.highlighted {
@@ -40,6 +41,7 @@ node {
 	label: data(name);
 	text-wrap: wrap;
 	text-max-width: 50;
+	text-overflow-wrap: anywhere;
 	text-valign: center;
 	text-halign: center;
 	text-events: yes;

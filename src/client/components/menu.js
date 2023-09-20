@@ -67,6 +67,8 @@ class Menu extends Component {
   selectNode(node){
     const { controller } = this.props;
 
+    console.log('menu.selectNode(', node.id());
+
     controller.closeMenu();
     controller.highlight(node);
     controller.showInfo(node);
