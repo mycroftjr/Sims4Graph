@@ -3,8 +3,10 @@ import path from "path";
 import { GlobOptions, globStream } from "glob";
 import { TuningResourceType } from "@s4tk/models/enums";
 import { ResourceKey } from "@s4tk/models/types";
-import { XmlNode, XmlCommentNode, XmlDocumentNode, XmlElementNode, XmlValueNode } from "@s4tk/xml-dom";
-import { RecycledNodesCache, XmlParsingOptions } from "@s4tk/xml-dom/lib/types";
+import { XmlNode, XmlCommentNode, XmlDocumentNode, XmlElementNode } from "@s4tk/xml-dom";
+import { XmlParsingOptions } from "@s4tk/xml-dom/lib/types";
+
+import { convertToCSV } from "./convertToCSV";
 
 export const TGI_REGEX = /(?<t>[0-9a-f]{8}).(?<g>[0-9a-f]{8}).(?<i>[0-9a-f]{16})/i;
 
@@ -165,6 +167,8 @@ function generate() {
 			return ret;
 		});
 		console.log(eles.nodes.length, eles.edges.length);
+
+		convertToCSV(eles);
 		/*
 		console.log("Instances that were not TuningTypes:");
 		nonTuningTypes = new Map([...nonTuningTypes.entries()].sort());
@@ -178,4 +182,6 @@ function generate() {
 	});
 }
 
-generate();
+if (require.main === module) {
+	generate();
+}

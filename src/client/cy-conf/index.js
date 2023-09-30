@@ -1,17 +1,6 @@
 import style from './style';
 import { _16To10 } from "simple-base-converter";
-import Papa from "papaparse";
-
-const edgePromise = import('./edges.json').then(
-    /**
-     * @typedef {{(source: string): string[]}} Edges
-     * @param {Object} obj
-     * @param {Edges} obj.default
-     */
-    ({ default: e }) => {
-        return e;
-    }
-);
+import * as Papa from "papaparse";
 
 function wrap(d) {
     return { data: d };
@@ -60,8 +49,18 @@ const nodePromise = new Promise((resolve, reject) => {
     });
 });
 
+const edgePromise = new Promise((resolve, reject) => {
+    Papa.parse(
+        "./edges.csv", {
+        download: true,
+        header: false,
+        delimiter: " ",
+        complete: resolve
+    });
+});
+
 const elements = Promise.all(nodePromise, edgePromise).then(
-    (v) => {
+    ([nodeResults, edgeResults]) => {
         /**
          * @typedef {{Class?: string, Instance?: string, Module?: string, name: string, id: string, Group?: string}} Node
          * @typedef {{source: string, target: string}} Edge
@@ -70,7 +69,7 @@ const elements = Promise.all(nodePromise, edgePromise).then(
          */
         let elements = { edges: [], nodes: [] };
         // process the nodes
-        for (const node of v[1]) {
+        for (const node of nodeResults) {
             const n = wrap(node);
             cacheNodeWords(n);
             node.position = { x: 0, y: 0 };
@@ -79,8 +78,8 @@ const elements = Promise.all(nodePromise, edgePromise).then(
             elements.nodes.push(n);
         }
         // process the edges
-        for (const source of Object.keys(v[0])) {
-            for (const target of edgeLists[source]) {
+        for (const [source, ...targets] of edgeResults.data) {
+            for (const target of targets) {
                 elements.edges.push(
                     wrap({
                         id: source + "->" + target,
@@ -90,6 +89,7 @@ const elements = Promise.all(nodePromise, edgePromise).then(
                 );
             }
         }
+
         console.log('elements processed:', e.nodes.length, e.edges.length);
         return elements;
     }
