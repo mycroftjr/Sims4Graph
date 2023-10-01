@@ -37,12 +37,12 @@ function convertToCSV(elements: Elements) {
 	fs.writeFileSync('public/edges.csv', edgesCSV);
 
 	// const edgesJson = JSON.stringify(ordered);
-	// fs.writeFileSync('src/client/cy-conf/edges.json', edgesJson.replaceAll("],", "],\n"));
+	// fs.writeFileSync('public/edges.json', edgesJson.replaceAll("],", "],\n"));
 }
 
 export { convertToCSV };
 
 if (require.main === module) {
-	const elements: Elements = JSON.parse(fs.readFileSync('src/client/cy-conf/elements.json', 'utf-8'));
+	const elements: Elements = JSON.parse(fs.readFileSync('public/elements.json', 'utf-8'));
 	convertToCSV(elements);
 }

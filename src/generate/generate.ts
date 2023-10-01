@@ -53,7 +53,8 @@ export { Node, Edge, Elements };
 
 function* scanXml(xml: XmlNode): Generator<string> {
 	if (xml instanceof XmlElementNode && xml.children.length == 2 && xml.children[1] instanceof XmlCommentNode) {
-		if (!xml.children[1].value.toString().startsWith("String: ")) {
+		const comment = xml.children[1].value.toString();
+		if (!comment.startsWith("String: ") && !comment.startsWith('"')) {
 			const val = BigInt(xml.innerValue).toString(16).toUpperCase();
 			if (val.includes("<!DOCTYPE") || val.startsWith("0x")) {
 				console.log(xml, "had inner value", val);
@@ -73,7 +74,7 @@ function* scanXml(xml: XmlNode): Generator<string> {
 
 function generate() {
 	const eles: Elements = {edges: [], nodes: []};
-	const root = "D:/XMLExtractor";
+	const root = "D:/S4TKXmlExtractor";
 	const options: GlobOptions = {
 		absolute: true,
 		cwd: root
@@ -99,8 +100,9 @@ function generate() {
 				// console.log("skipping", file, "since", xml.attributes.i, "!=", TuningResourceType.getAttr(attr));
 				const key = parseTGI(file.toString());
 				const type = key.type;
-				if (type in TuningResourceType || TuningResourceType.getAttr(type) != null) {
-					console.log(xml.attributes.i, "should have been", TuningResourceType.getAttr(type), file);
+				if ((type in TuningResourceType) || TuningResourceType.getAttr(type)) {
+					console.log(xml.attributes.i, type.toString(16), "should have been",
+						TuningResourceType[type], TuningResourceType.getAttr(type), file);
 				}
 				nonTuningTypes.set(xml.attributes.i, [key, file.toString()]);
 			}
@@ -155,7 +157,7 @@ function generate() {
 			console.log(eles.nodes.length, eles.edges.length);
 		}
 	});
-	const p = fs.realpathSync("src/client/cy-conf") + "/elements.json";
+	const p = fs.realpathSync("public") + "/elements.json";
 	console.log(p);
 	packages.on("end", () => {
 		console.log(eles.nodes.length, eles.edges.length);
