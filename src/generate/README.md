@@ -1,1 +1,1 @@
-Note: The input file for geneerate.ts (D:/S4TKXmlExtractor) is the result of running [XML Extractor](https://scumbumbomods.com/xml-extractor) with XML-only settings, OR my equivalent [s4tk-based script](https://github.com/mycroftjr/s4tk-extraction/blob/main/scripts/xml-extractor.ts).
+Note: The input file for generate.ts (D:/S4TKXmlExtractor) is the result of running [XML Extractor](https://scumbumbomods.com/xml-extractor) with XML-only settings, OR my equivalent [s4tk-based script](https://github.com/mycroftjr/s4tk-extraction/blob/main/scripts/xml-extractor.ts).
